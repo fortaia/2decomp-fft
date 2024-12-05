@@ -140,7 +140,7 @@ check: examples
 clean:
 	rm -rf $(OBJDIR) $(DECOMPINC) lib$(LIBDECOMP).a
 	rm -f ./*.o ./*.mod ./*.smod # Ensure old files are removed
-	rm -f Makefile.settings
+	rm -f Makefile.settings lib$(LIBDECOMP).a
 
 .PHONY: Makefile.settings
 
