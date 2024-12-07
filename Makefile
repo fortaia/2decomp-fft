@@ -6,15 +6,14 @@
 GIT_VERSION := $(shell git describe --tag --long --always)
 
 LCL = local# local,lad,sdu,archer
-CMP = gcc# intel,gcc,nagfor,cray,nvhpc
+#FCOMP = GNU# intel,gnu,nagfor,cray,nvhpc
 FFT ?= fftw3_f03# fftw3,fftw3_f03,generic,mkl,cufft
 PARAMOD = mpi # multicore,gpu
 PROFILER ?= none# none, caliper
 
 BUILD ?= Release # debug can be used with gcc
-FCFLAGS ?= # user can set default compiler flags
-LDFLAGS ?= # user can set default linker flags
-FFLAGS = $(FCFLAGS)
+FCFLAGS ?=# user can set default compiler flags
+LDFLAGS ?=# user can set default linker flags
 LFLAGS = $(LDFLAGS)
 MODFLAG = -J 
 
@@ -23,10 +22,11 @@ LIBDECOMP = decomp2d
 AR = ar
 LIBOPT = rcs
 
-#######CMP settings###########
-CODE_CONF=../../build.conf
+#######Compilation settings###########
+CODE_DIR=../..
+include $(CODE_DIR)/build.conf
 
-CMPINC = Makefile_comp
+CMPINC = Makefile.comp
 
 include $(CMPINC)
 
@@ -87,14 +87,14 @@ endif
 
 #######OPTIONS settings###########
 OPT =
-LINKOPT = $(FFLAGS)
+LINKOPT = $(FCFLAGS)
 #-----------------------------------------------------------------------
 # Normally no need to change anything below
 
 OBJDIR = obj
 SRCDIR = src
 DECOMPINC = mod
-FFLAGS += $(MODFLAG)$(DECOMPINC) -I$(DECOMPINC) 
+FCFLAGS += $(MODFLAG)$(DECOMPINC) -I$(DECOMPINC) 
 
 SRCDECOMP := $(SRCDECOMP) fft_$(FFT).f90 fft_log.f90
 SRCDECOMP_ = $(patsubst %.f90,$(SRCDIR)/%.f90,$(filter-out %/mkl_dfti.f90,$(SRCDECOMP)))
@@ -117,15 +117,15 @@ $(LIBDECOMP) : Makefile.settings lib$(LIBDECOMP).a
 
 lib$(LIBDECOMP).a: $(OBJDECOMP_MKL) $(OBJDECOMP)
 	$(AR) $(LIBOPT) $@ $^
-	mv *.mod *.smod $(DECOMPINC)
+
 $(OBJDIR):
 	mkdir $(OBJDIR)
 
 $(OBJDECOMP) : $(OBJDIR)/%.o : $(SRCDIR)/%.f90
-	$(FC) $(FFLAGS) $(OPT) $(DEFS) $(INC) -c $< -o $@
+	$(FC) $(FCFLAGS) $(OPT) $(DEFS) $(INC) -c $< -o $@
 
 $(OBJDECOMP_MKL) : $(OBJDIR)/%.o : $(MKLROOT)/include/%.f90
-	$(FC) $(FFLAGS) $(OPT) $(DEFS) $(INC) -c $(MKLROOT)/include/mkl_dfti.f90 -o $(OBJDIR)/mkl_dfti.o
+	$(FC) $(FCFLAGS) $(OPT) $(DEFS) $(INC) -c $(MKLROOT)/include/mkl_dfti.f90 -o $(OBJDIR)/mkl_dfti.o
 
 examples: $(LIBDECOMP)
 	$(MAKE) -C examples
@@ -146,7 +146,7 @@ clean:
 
 Makefile.settings:
 	echo "FC = $(FC)" > $@
-	echo "FFLAGS = $(FFLAGS)" >> $@
+	echo "FCFLAGS = $(FCFLAGS)" >> $@
 	echo "OPT = $(OPT)" >> $@
 	echo "DEFS = $(DEFS)" >> $@
 	echo "INC = $(INC)" >> $@
