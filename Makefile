@@ -6,8 +6,9 @@
 GIT_VERSION := $(shell git describe --tag --long --always)
 
 LCL = local# local,lad,sdu,archer
-#FCOMP = GNU# intel,gnu,nagfor,cray,nvhpc
+### Compiler specified in the FCOMP variable of the build.conf file (options:intel,gnu,nagfor,cray,nvhpc)
 FFT ?= fftw3_f03# fftw3,fftw3_f03,generic,mkl,cufft
+FFTW3_PATH ?= /usr# rooot path if the FFT=fftw3,fftw3_f03
 PARAMOD = mpi # multicore,gpu
 PROFILER ?= none# none, caliper
 
@@ -36,13 +37,11 @@ SRCDECOMP = decomp_2d_constants.f90 decomp_2d_mpi.f90 profiler_none.f90 factor.f
 
 #######FFT settings##########
 ifeq ($(FFT),fftw3)
-  FFTW3_PATH ?= /usr
   FFTW3_PATH_INCLUDE ?= $(FFTW3_PATH)/include
   FFTW3_PATH_LIB ?= $(FFTW3_PATH)/lib/x86_64-linux-gnu
   INC=-I$(FFTW3_PATH_INCLUDE)
   LIBFFT=-L$(FFTW3_PATH_LIB) -lfftw3 -lfftw3f
 else ifeq ($(FFT),fftw3_f03)
-  FFTW3_PATH ?= /usr
   FFTW3_PATH_INCLUDE ?= $(FFTW3_PATH)/include
   FFTW3_PATH_LIB ?= $(FFTW3_PATH)/lib/x86_64-linux-gnu
   INC=-I$(FFTW3_PATH_INCLUDE)

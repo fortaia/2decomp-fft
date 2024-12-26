@@ -6,7 +6,7 @@ include $(CODE_DIR)/build.conf
 
 DEFS = -DENABLE_INPLACE=ON -DEVEN=ON 
 ifneq ($(strip $(SINGLE_PRECISION)),1)
-DEFS += -DDOUBLE_PRECISION=ON
+DEFS += -DDOUBLE_PREC=ON
 endif
 ifeq ($(strip $(FCFLAGS_DEBUG)),1)
 BUILD=DEBUG
